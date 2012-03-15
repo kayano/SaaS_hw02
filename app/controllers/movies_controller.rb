@@ -8,10 +8,29 @@ class MoviesController < ApplicationController
 
   def index
     @sort_by ||= params[:sort]
-    if @sort_by
-      @movies = Movie.order(@sort_by)
+    @all_ratings = Movie.get_ratings
+    ratings ||= params[:ratings]
+    if ratings
+      if ratings.is_a? Array
+        @checked_ratings = ratings
+      else
+        @checked_ratings = ratings.keys
+      end
     else
-      @movies = Movie.all
+      @checked_ratings = []
+    end
+    if ratings
+      if @sort_by
+        @movies = Movie.where(:rating => @checked_ratings).order(@sort_by)
+      else
+        @movies = Movie.where(:rating => @checked_ratings)
+      end
+    else
+      if @sort_by
+        @movies = Movie.order(@sort_by)
+      else
+        @movies = Movie.all
+      end
     end
   end
 
