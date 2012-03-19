@@ -7,23 +7,27 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @sort_by ||= params[:sort]
-    @all_ratings = Movie.get_ratings
-    ratings ||= params[:ratings]
-    if ratings
-      if ratings.is_a? Array
-        @checked_ratings = ratings
-      else
-        @checked_ratings = ratings.keys
-      end
-    else
-      @checked_ratings = []
+    #@sort_by ||= params[:sort]
+    if params[:ratings].nil? && params[:commit]
+      session[:checked_ratings] = nil
     end
-    if ratings
+
+    if (params[:sort].nil? && params[:ratings].nil?) &&(session[:sort_by] || session[:checked_ratings])
+      redirect_to movies_path :sort => session[:sort_by], :ratings => session[:checked_ratings]
+    end
+    session[:sort_by] = params[:sort] if params[:sort]
+    session[:checked_ratings] = params[:ratings] if params[:ratings]
+
+    @sort_by = session[:sort_by]
+    @checked_ratings = session[:checked_ratings]
+
+    @all_ratings = Movie.get_ratings
+
+    if @checked_ratings
       if @sort_by
-        @movies = Movie.where(:rating => @checked_ratings).order(@sort_by)
+        @movies = Movie.where(:rating => @checked_ratings.keys).order(@sort_by)
       else
-        @movies = Movie.where(:rating => @checked_ratings)
+        @movies = Movie.where(:rating => @checked_ratings.keys)
       end
     else
       if @sort_by

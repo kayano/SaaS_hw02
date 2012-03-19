@@ -4,7 +4,7 @@
   Include:
   - @all_ratings.each do |rating|
     = rating
-    -if @checked_ratings.any? {|x| x == rating}
+    -if @checked_ratings && @checked_ratings.keys.any? {|x| x == rating}
       = check_box_tag "ratings[#{rating}]", '',true, :id => "ratings_#{rating}"
     -else
       = check_box_tag "ratings[#{rating}]",'',false, :id => "ratings_#{rating}"
